@@ -21,6 +21,7 @@ public class Processor implements Runnable {
     private Handler handler;
     protected ConcurrentLinkedQueue<SocketChannel> toRegister;
     protected ConcurrentLinkedQueue<SelectionKey> toCancel;
+    protected ConcurrentLinkedQueue<SelectionKey> toWrite;
 
     public Processor(String name, Filter filter, Handler handler, int num) {
         try {
@@ -29,6 +30,7 @@ public class Processor implements Runnable {
             selector = Selector.open();
             toRegister = new ConcurrentLinkedQueue<SocketChannel>();
             toCancel = new ConcurrentLinkedQueue<SelectionKey>();
+            toWrite = new ConcurrentLinkedQueue<SelectionKey>();
 
             new Thread(this, name + "-Processor-" + num).start();
         } catch (Throwable th) {
@@ -85,7 +87,7 @@ public class Processor implements Runnable {
         Session session = (Session) key.attachment();
         try {
             SocketChannel channel = (SocketChannel) key.channel();
-            int size = session.getReadBufferSize(); //只能读取这么多数据
+            int size = session.getReadBufferSize();
             ByteBuffer buffer = ByteBuffer.allocate(size);
             int read = 0;
             int n;
@@ -93,12 +95,12 @@ public class Processor implements Runnable {
             if (read > 0) {
                 buffer.flip();
                 filter.decode(session, buffer);
-//                if (read == size) session.increaseReadBufferSize();
-//                else if (read < size >>> 1) session.decreaseReadBufferSize();
+                if (read == size) session.increaseReadBufferSize();
+                else if (read < size >>> 1) session.decreaseReadBufferSize();
 //                session.setLastReadTime(now);
-//                session.increaseReadBytes(read);
+                session.increaseReadBytes(read);
             } else {
-//                session.decreaseReadBufferSize();
+                session.decreaseReadBufferSize();
             }
             if (n < 0) {
 //                session.close(false);

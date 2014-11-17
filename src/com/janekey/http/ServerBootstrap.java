@@ -20,7 +20,9 @@ public class ServerBootstrap {
                 new Filter() {
                     @Override
                     public void decode(Session session, ByteBuffer buffer) {
-
+                        while (buffer.hasRemaining())
+                            System.out.print((char) buffer.get());
+//                        System.out.println();
                     }
 
                     @Override
