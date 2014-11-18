@@ -14,6 +14,8 @@ import java.util.Iterator;
  */
 public class Acceptor implements Runnable {
 
+    protected static final int DEFAULT_IO_TIMEOUT_MILLIS = 30000;//原30秒
+
     protected Processor[] processors;
     protected Selector selector;
     private Filter filter;                  //过滤器
@@ -31,7 +33,7 @@ public class Acceptor implements Runnable {
             serverSocketChannel.configureBlocking(false);
             serverSocketChannel.socket().bind(bindAddress);
             SelectionKey key = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-
+            key.attach(DEFAULT_IO_TIMEOUT_MILLIS);
         } catch (Throwable th) {
             Logger.log(th, "Acceptor Constructor Error");
             throw new RuntimeException(th);
@@ -52,7 +54,8 @@ public class Acceptor implements Runnable {
                         SocketChannel socketChannel = serverChannel.accept();
 
                         int processorNum = Math.abs(sessionId) % processors.length;
-                        processors[processorNum].scheduleRegister(socketChannel);
+                        int ioTimeoutMillis = (Integer) key.attachment();
+                        processors[processorNum].scheduleRegister(socketChannel, sessionId, ioTimeoutMillis);
                         sessionId++;
                         readyKeys.remove();
                     }
