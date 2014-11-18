@@ -1,6 +1,6 @@
-package com.janekey.http.net;
+package com.janekey.httpserver.net;
 
-import com.janekey.http.util.Millisecond100Clock;
+import com.janekey.httpserver.util.Millisecond100Clock;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * User: p_qizheng
+ * User: janekey
  * Date: 14-11-14
  * Time: 下午5:21
  */

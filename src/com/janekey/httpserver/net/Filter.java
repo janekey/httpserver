@@ -1,9 +1,9 @@
-package com.janekey.http.net;
+package com.janekey.httpserver.net;
 
 import java.nio.ByteBuffer;
 
 /**
- * User: p_qizheng
+ * User: janekey
  * Date: 14-11-14
  * Time: 下午5:21
  */

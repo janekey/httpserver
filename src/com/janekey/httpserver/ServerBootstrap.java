@@ -1,15 +1,15 @@
-package com.janekey.http;
+package com.janekey.httpserver;
 
-import com.janekey.http.net.Acceptor;
-import com.janekey.http.net.Filter;
-import com.janekey.http.net.Handler;
-import com.janekey.http.net.Session;
+import com.janekey.httpserver.net.Acceptor;
+import com.janekey.httpserver.net.Filter;
+import com.janekey.httpserver.net.Handler;
+import com.janekey.httpserver.net.Session;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 /**
- * User: p_qizheng
+ * User: janekey
  * Date: 14-11-14
  * Time: 上午11:51
  */
@@ -22,7 +22,12 @@ public class ServerBootstrap {
                     public void decode(Session session, ByteBuffer buffer) {
                         while (buffer.hasRemaining())
                             System.out.print((char) buffer.get());
-//                        System.out.println();
+                        System.out.println();
+
+                        ByteBuffer bb = ByteBuffer.allocate(100);
+                        bb.put("new=".getBytes());
+                        bb.flip();
+                        session.write(bb);
                     }
 
                     @Override

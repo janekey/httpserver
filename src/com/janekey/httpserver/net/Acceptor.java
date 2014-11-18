@@ -1,4 +1,4 @@
-package com.janekey.http.net;
+package com.janekey.httpserver.net;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -8,7 +8,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 /**
- * User: p_qizheng
+ * User: janekey
  * Date: 14-11-14
  * Time: 下午5:21
  */

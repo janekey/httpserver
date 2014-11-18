@@ -1,8 +1,8 @@
-package com.janekey.http.net;
+package com.janekey.httpserver.net;
 
 /**
  * 三元组
- * User: p_qizheng
+ * User: janekey
  * Date: 14-11-18
  * Time: 下午3:36
  */
