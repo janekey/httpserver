@@ -1,7 +1,11 @@
 package com.janekey.httpserver.net;
 
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -16,6 +20,7 @@ public class Session {
     private static final int MAX_READ_BUFF_SIZE = 64 * 1024;
     private static final int MIN_READ_BUFF_SIZE = 8;
 
+    private Map<String, Object> attributes;
     private ConcurrentLinkedQueue<ByteBuffer> writeQueue;
     private int id;
     private int readBufferSize;
@@ -34,6 +39,7 @@ public class Session {
         this.processor = processor;
         this.selectionKey = selectionKey;
         this.id = sessionId;
+        attributes = new HashMap<String, Object>();
         readBytes = 0;
         writeBytes = 0;
         openTime = 0;
@@ -97,6 +103,10 @@ public class Session {
         }
     }
 
+    public SocketAddress getRemoteAddress() {
+        return ((SocketChannel) selectionKey.channel()).socket().getRemoteSocketAddress();
+    }
+
     public int getIoTimeoutMillis() {
         return ioTimeoutMillis;
     }
@@ -131,5 +141,17 @@ public class Session {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setAttribute(String key, Object value) {
+        attributes.put(key, value);
+    }
+
+    public Object getAttribute(String key) {
+        return attributes.get(key);
+    }
+
+    public void removeAttribute(String key) {
+        attributes.remove(key);
     }
 }
