@@ -1,10 +1,12 @@
 package com.janekey.httpserver.http;
 
+import com.janekey.httpserver.net.Logger;
 import com.janekey.httpserver.net.Session;
 import com.janekey.httpserver.util.StringUtil;
 
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,9 +26,13 @@ public class HttpRequestImpl {
     PipedOutputStream pipedOutputStream;
     Map<String, String> headMap = new HashMap<String, String>();
     Session session;
+    HttpResponseImpl response;
 
-    public HttpRequestImpl(Session session) {
+    private String characterEncoding;
+
+    public HttpRequestImpl(Session session, String characterEncoding) {
         this.session = session;
+        this.response = new HttpResponseImpl(this, characterEncoding);
     }
 
     public String getRequestURI() {
@@ -64,5 +70,28 @@ public class HttpRequestImpl {
     public int getContentLength() {
         String len = getHeader("Content-Length");
         return StringUtil.isNotEmpty(len) ? Integer.parseInt(len) : 0;
+    }
+
+    public String getCharacterEncoding() {
+        return characterEncoding;
+    }
+
+    public void setCharacterEncoding(String characterEncoding)
+            throws UnsupportedEncodingException {
+        this.characterEncoding = characterEncoding;
+    }
+
+    public boolean isKeepAlive() {
+        return ("Keep-Alive".equalsIgnoreCase(getHeader("Connection")) ||
+                        ( !getProtocol().equals("HTTP/1.0") && !"close".equalsIgnoreCase(getHeader("Connection")) )
+        );
+    }
+
+    public void commit() {
+        try {
+            response.outData(session);
+        } catch (Throwable th) {
+            Logger.log(th, "commit error");
+        }
     }
 }

@@ -50,7 +50,7 @@ public class HttpDecoder {
     private HttpRequestImpl getHttpRequestImpl(Session session) {
         HttpRequestImpl req = (HttpRequestImpl) session.getAttribute(HTTP_REQUEST);
         if (req == null) {
-            req = new HttpRequestImpl(session);
+            req = new HttpRequestImpl(session, ENCODING);
             session.setAttribute(HTTP_REQUEST, req);
         }
         return req;
@@ -91,12 +91,14 @@ public class HttpDecoder {
             finish(session, req);
 //            req.response.scheduleSendError(httpStatus, content);
 //            req.commitAndAllowDuplicate();//业务逻辑处理
+            req.commit();
             System.out.println("AbstractHttpDecoder.responseError()");
         }
 
         protected void response(Session session, HttpRequestImpl req) {
             finish(session, req);
 //            req.commitAndAllowDuplicate();//业务逻辑处理
+            req.commit();
         }
 
         protected abstract boolean decode(ByteBuffer buf, Session session, HttpRequestImpl req) throws Throwable;
