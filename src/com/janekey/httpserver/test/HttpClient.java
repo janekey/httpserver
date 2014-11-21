@@ -24,12 +24,15 @@ public class HttpClient {
     public HttpClient(String url) throws IOException {
         URL u = new URL(url);
         connection = (HttpURLConnection) u.openConnection();
+        connection.setReadTimeout(3000);
+        connection.setConnectTimeout(0);
 //        lineSeparator =	java.security.AccessController.doPrivileged(
 //                new sun.security.action.GetPropertyAction("line.separator"));
         lineSeparator = "\r\n";
     }
 
     private void initHead() {
+        connection.setRequestProperty("Connection", "close");
 //        connection.setRequestProperty("Accept", accept);
 //        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 //        if (referer != null) connection.setRequestProperty("Referer", referer);
@@ -57,6 +60,7 @@ public class HttpClient {
     private String readData() throws IOException {
         InputStream is = connection.getInputStream();
         int available = is.available();
+        if (available != 14) System.out.println("available:" + available);
         byte[] buffer = new byte[available];
         String bufferString = null;
         if (is.read(buffer) != -1) {

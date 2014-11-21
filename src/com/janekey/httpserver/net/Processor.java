@@ -143,7 +143,6 @@ public class Processor implements Runnable {
         } catch (Throwable th) {
             session.close(true);
             th.printStackTrace();
-            throw new RuntimeException(th);
         }
     }
 
@@ -203,7 +202,6 @@ public class Processor implements Runnable {
             }
         } catch (Throwable th) {
             session.close(true);
-            throw new RuntimeException(th);
         }
     }
 

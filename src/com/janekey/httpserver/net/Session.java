@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Session {
 
     public static final ByteBuffer CLOSE_FLAG = ByteBuffer.allocate(0);
-    private static final int INIT_READ_BUFF_SIZE = 8;//todo 1024
+    private static final int INIT_READ_BUFF_SIZE = 1024;
     private static final int MAX_READ_BUFF_SIZE = 64 * 1024;
     private static final int MIN_READ_BUFF_SIZE = 8;
 

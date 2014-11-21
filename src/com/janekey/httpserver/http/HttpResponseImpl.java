@@ -87,8 +87,15 @@ public class HttpResponseImpl {
 
         String content = "this is a page";
         setHeader("Content-Length", String.valueOf(content.length()));
-        session.write(ByteBuffer.wrap(getHeadData()));
-        session.write(ByteBuffer.wrap(content.getBytes(characterEncoding)));
+        byte[] b1 = getHeadData();
+        byte[] b2 = content.getBytes(characterEncoding);
+        ByteBuffer buffer = ByteBuffer.allocate(b1.length + b2.length);
+        buffer.put(b1);
+        buffer.put(b2);
+        buffer.flip();
+        session.write(buffer);
+//        session.write(ByteBuffer.wrap(getHeadData()));
+//        session.write(ByteBuffer.wrap(content.getBytes(characterEncoding)));
         System.out.println("out***");
         if (!request.isKeepAlive())
             session.close(false);

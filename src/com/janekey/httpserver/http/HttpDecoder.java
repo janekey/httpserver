@@ -187,7 +187,6 @@ public class HttpDecoder {
 
                     if (StringUtil.isEmpty(headLine)) {
                         if (!req.getMethod().equals("POST") && !req.getMethod().equals("PUT"))
-                            System.out.println("empty.response()");
                             response(session, req);
                         return true;
                     } else {
