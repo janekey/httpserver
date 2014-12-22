@@ -62,6 +62,18 @@ public class Session {
         }
     }
 
+    public void write(byte[] message) {
+        try {
+            if (isOpen) {
+                ByteBuffer bb = ByteBuffer.allocate(message.length);
+                writeQueue.offer(bb.put(message));
+                scheduleWrite(true);
+            }
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
+    }
+
     public int getReadBufferSize() {
         return readBufferSize;
     }

@@ -12,7 +12,7 @@ public interface Filter {
     /**
      * 解码:读取数据时进行过滤
      */
-    public void decode(Session session, ByteBuffer buffer) throws Throwable;
+    public void decode(Session session, ByteBuffer buffer, Handler handler) throws Throwable;
 
     /**
      * 编码:输出数据时进行编码

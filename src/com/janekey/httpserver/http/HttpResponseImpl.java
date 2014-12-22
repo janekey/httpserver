@@ -21,9 +21,13 @@ public class HttpResponseImpl {
 
     private HttpRequestImpl request;
     private int status, bufferSize;
+    private boolean committed;
     private String characterEncoding, shortMessage;
     private Map<String, String> headMap = new HashMap<String, String>();
     private List<Cookie> cookies = new LinkedList<Cookie>();
+
+    boolean system;
+    String systemResponseContent;
 
     public HttpResponseImpl(HttpRequestImpl request, String characterEncoding) {
         this.request = request;
@@ -31,6 +35,59 @@ public class HttpResponseImpl {
 
         setStatus(200);
         setHeader("Server", "HttpServer");
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+        this.shortMessage = Constants.STATUS_CODE.get(status);
+    }
+
+    public void setHeader(String name, String value) {
+        headMap.put(name, value);
+    }
+
+    public boolean isCommitted() {
+        return committed;
+    }
+
+    public void setCommitted(boolean committed) {
+        this.committed = committed;
+    }
+
+    public void scheduleSendError(int sc, String content) {
+        setStatus(sc);
+        systemResponseContent = content;
+        system = true;
+        request.systemReq = true;
+    }
+
+    public void outSystemData(Session session) throws IOException {
+        if (isCommitted())
+            throw new IllegalStateException("response is committed");
+
+        if (status >= 400) {
+            try {
+                boolean hasContent = StringUtil.isNotEmpty(systemResponseContent);
+                byte[] b = null;
+
+                if (hasContent) {
+                    b = systemResponseContent.getBytes(characterEncoding);
+                    setHeader("Content-Length", String.valueOf(b.length));
+                } else {
+                    setHeader("Content-Length", "0");
+                }
+
+                byte[] headByte = getHeadData();
+                ByteBuffer buffer = ByteBuffer.allocate(hasContent ? headByte.length + b.length : headByte.length);
+                buffer.put(headByte);
+                if (hasContent) buffer.put(b);
+
+                session.write(buffer);
+            } finally {
+                session.close(false);
+            }
+            setCommitted(true);
+        }
     }
 
     public byte[] getHeadData() {
@@ -99,15 +156,6 @@ public class HttpResponseImpl {
         System.out.println("out***");
         if (!request.isKeepAlive())
             session.close(false);
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-        this.shortMessage = Constants.STATUS_CODE.get(status);
-    }
-
-    public void setHeader(String name, String value) {
-        headMap.put(name, value);
     }
 
     public void addHeader(String name, String value) {

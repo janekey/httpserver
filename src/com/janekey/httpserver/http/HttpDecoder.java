@@ -1,5 +1,6 @@
 package com.janekey.httpserver.http;
 
+import com.janekey.httpserver.net.Handler;
 import com.janekey.httpserver.net.Logger;
 import com.janekey.httpserver.net.Session;
 import com.janekey.httpserver.util.StringUtil;
@@ -29,9 +30,9 @@ public class HttpDecoder {
 
     private AbstractHttpDecoder[] httpDecode = new AbstractHttpDecoder[]{new RequestLineDecoder(), new HeadDecoder(), new BodyDecoder()};
 
-    public void decode(ByteBuffer buf, Session session) throws Throwable {
+    public void decode(ByteBuffer buf, Session session, Handler handler) throws Throwable {
         ByteBuffer now = getBuffer(buf, session);
-        HttpRequestImpl req = getHttpRequestImpl(session);
+        HttpRequestImpl req = getHttpRequestImpl(session, handler);
         httpDecode[req.status].decode0(now, session, req);
     }
 
@@ -47,10 +48,10 @@ public class HttpDecoder {
         return now;
     }
 
-    private HttpRequestImpl getHttpRequestImpl(Session session) {
+    private HttpRequestImpl getHttpRequestImpl(Session session, Handler handler) {
         HttpRequestImpl req = (HttpRequestImpl) session.getAttribute(HTTP_REQUEST);
         if (req == null) {
-            req = new HttpRequestImpl(session, ENCODING);
+            req = new HttpRequestImpl(session, handler, ENCODING);
             session.setAttribute(HTTP_REQUEST, req);
         }
         return req;
@@ -86,10 +87,9 @@ public class HttpDecoder {
             req.status = httpDecode.length;
         }
 
-        protected void responseError(Session session,
-                                     HttpRequestImpl req, int httpStatus, String content) {
+        protected void responseError(Session session, HttpRequestImpl req, int httpStatus, String content) {
             finish(session, req);
-//            req.response.scheduleSendError(httpStatus, content);
+            req.response.scheduleSendError(httpStatus, content);
 //            req.commitAndAllowDuplicate();//业务逻辑处理
             req.commit();
             System.out.println("AbstractHttpDecoder.responseError()");
@@ -124,6 +124,7 @@ public class HttpDecoder {
                     byte[] data = new byte[req.offset + 1];
                     buf.get(data);
                     String requestLine = new String(data, ENCODING).trim();
+                    System.out.println(requestLine);// RequestLine
                     if (StringUtil.isEmpty(requestLine)) {
                         String msg = "request line length is 0|" + session.getRemoteAddress();
                         Logger.log(msg);

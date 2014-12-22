@@ -1,6 +1,7 @@
 package com.janekey.httpserver.http;
 
 import com.janekey.httpserver.net.Filter;
+import com.janekey.httpserver.net.Handler;
 import com.janekey.httpserver.net.Session;
 
 import java.nio.ByteBuffer;
@@ -15,8 +16,8 @@ public class HttpFilter implements Filter {
     private HttpDecoder httpDecoder = new HttpDecoder();
 
     @Override
-    public void decode(Session session, ByteBuffer buffer) throws Throwable {
-        httpDecoder.decode(buffer, session);
+    public void decode(Session session, ByteBuffer buffer, Handler handler) throws Throwable {
+        httpDecoder.decode(buffer, session, handler);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.janekey.httpserver.http;
 
+import com.janekey.httpserver.net.Handler;
 import com.janekey.httpserver.net.Logger;
 import com.janekey.httpserver.net.Session;
 import com.janekey.httpserver.util.StringUtil;
@@ -27,11 +28,14 @@ public class HttpRequestImpl {
     Map<String, String> headMap = new HashMap<String, String>();
     Session session;
     HttpResponseImpl response;
+    Handler handler;
+    boolean systemReq = false;
 
     private String characterEncoding;
 
-    public HttpRequestImpl(Session session, String characterEncoding) {
+    public HttpRequestImpl(Session session, Handler handler, String characterEncoding) {
         this.session = session;
+        this.handler = handler;
         this.response = new HttpResponseImpl(this, characterEncoding);
     }
 
@@ -82,14 +86,15 @@ public class HttpRequestImpl {
     }
 
     public boolean isKeepAlive() {
-        return ("Keep-Alive".equalsIgnoreCase(getHeader("Connection")) ||
-                        ( !getProtocol().equals("HTTP/1.0") && !"close".equalsIgnoreCase(getHeader("Connection")) )
-        );
+        return !systemReq &&
+                ("Keep-Alive".equalsIgnoreCase(getHeader("Connection")) ||
+                        ( !getProtocol().equals("HTTP/1.0") && !"close".equalsIgnoreCase(getHeader("Connection")) ));
     }
 
     public void commit() {
         try {
-            response.outData(session);
+            handler.doReceived(session, this);
+//            response.outData(session);
         } catch (Throwable th) {
             Logger.log(th, "commit error");
         }

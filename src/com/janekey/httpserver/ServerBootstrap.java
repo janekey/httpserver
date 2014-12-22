@@ -1,6 +1,7 @@
 package com.janekey.httpserver;
 
 import com.janekey.httpserver.http.HttpFilter;
+import com.janekey.httpserver.http.HttpHandler;
 import com.janekey.httpserver.net.Acceptor;
 import com.janekey.httpserver.net.Handler;
 
@@ -14,7 +15,7 @@ import java.net.InetSocketAddress;
 public class ServerBootstrap {
 
     public static void main(String[] args) {
-        Acceptor acceptor = new Acceptor("httpserver", new HttpFilter(), new Handler(), new InetSocketAddress(12345));
+        Acceptor acceptor = new Acceptor("httpserver", new HttpFilter(), new HttpHandler(), new InetSocketAddress(12345));
         acceptor.listen();
     }
 

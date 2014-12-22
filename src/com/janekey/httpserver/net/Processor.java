@@ -129,7 +129,7 @@ public class Processor implements Runnable {
             while ((n = channel.read(buffer)) > 0) read += n;
             if (read > 0) {
                 buffer.flip();
-                filter.decode(session, buffer);
+                filter.decode(session, buffer, handler);
                 if (read == size) session.increaseReadBufferSize();
                 else if (read < size >>> 1) session.decreaseReadBufferSize();
                 session.setLastReadTime(now);
